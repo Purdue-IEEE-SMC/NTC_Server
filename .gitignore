@@ -15,6 +15,7 @@ client/coverage
 # production
 client/build
 api/dist
+uploads/
 
 # misc
 .DS_Store
