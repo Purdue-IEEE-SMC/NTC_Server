@@ -1,11 +1,10 @@
 # JetBrains files
-.idea/*
+.idea/
 !.idea/.name
 !.idea/runConfigurations
 
 # dependencies
-client/node_modules
-api/node_modules
+node_modules
 client/.pnp
 .pnp.js
 
