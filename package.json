@@ -3,14 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon -r dotenv/config ./bin/www dotenv_config_path=./.env"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
+    "debug": "^4.3.4",
     "express": "~4.16.1",
     "morgan": "~1.9.1",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
