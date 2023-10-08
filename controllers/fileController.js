@@ -18,7 +18,6 @@ const upload = multer({
   },
 })
 
-
 // Upload files and encrypt them
 exports.uploadFiles = (req, res) => {
   upload.array('files', 10)(req, res, async (err) => {
@@ -67,7 +66,7 @@ exports.uploadFiles = (req, res) => {
 
 exports.downloadFile = async (req, res) => {
   const { filename } = req.params
-  const filePath = path.resolve('uploads', filename)
+  const filePath = path.resolve('uploads', filename + '.enc')
 
   try {
     if (!fs.existsSync(filePath)) {
@@ -122,5 +121,29 @@ exports.listFiles = (req, res) => {
     })
 
     res.status(200).json(fileList)
+  })
+}
+
+exports.deleteFile = (req, res) => {
+  const { filename } = req.params
+  const filePath = path.resolve('uploads', filename + '.enc') // Assuming the filename provided does not have the .enc extension
+
+  fs.access(filePath, (err) => {
+    if (err) {
+      if (err.code === 'ENOENT') { // File not found
+        return res.status(404).json({ error: 'File not found' })
+      }
+      console.error(err)
+      return res.status(500).send({ error: 'Error accessing the file' })
+    }
+
+    // File exists, attempt to delete
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error(err)
+        return res.status(500).send({ error: 'Error deleting the file' })
+      }
+      res.status(200).json({ message: 'File deleted successfully' })
+    })
   })
 }
