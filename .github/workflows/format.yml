@@ -1,0 +1,28 @@
+# From: hack4impact-uiuc/mern-template
+name: format
+
+on: push
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: api/node_modules
+          key: ${{ runner.os }}-cache
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: Check formatting
+        run: npm run format:check
