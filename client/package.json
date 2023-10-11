@@ -19,7 +19,8 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "husky": "^8.0.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -41,5 +42,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "lint-staged": {
+    "**/*.{jjs,jsx,ts,tsx,css,scss,json,md}": [
+      "eslint --fix src --ext .js,.jsx,.ts,.tsx",
+      "prettier --write \"./**/*.{js,jsx,ts,tsx,css,scss,json,md}\""
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }
