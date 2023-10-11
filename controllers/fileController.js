@@ -2,10 +2,12 @@ const multer = require('multer');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const debug = require('debug')('ntc-server:server');
 const { pipeline } = require('stream');
 const { promisify } = require('util');
-const pipelineAsync = promisify(pipeline);
 const { Readable } = require('stream');
+
+const pipelineAsync = promisify(pipeline);
 
 // Set up multer with a file filter to only allow CSV files
 // Use memory storage to avoid writing to disk
@@ -15,7 +17,7 @@ const upload = multer({
     if (path.extname(file.originalname) !== '.csv') {
       return cb(new Error('Only CSV files are allowed'));
     }
-    cb(null, true);
+    return cb(null, true);
   },
 });
 
@@ -29,7 +31,7 @@ exports.uploadFiles = (req, res) => {
     try {
       // Encrypt each file asynchronously
       const encryptedFilesPromises = req.files.map(async (file) => {
-        const outputPath = path.resolve('uploads', file.originalname + '.enc');
+        const outputPath = path.resolve('uploads', `${file.originalname}.enc`);
 
         // Generate a random IV and salt
         const iv = crypto.randomBytes(16);
@@ -47,25 +49,25 @@ exports.uploadFiles = (req, res) => {
         // Asynchronously write the encrypted file
         await fs.promises.writeFile(outputPath, encrypted);
 
-        return file.originalname + '.enc';
+        return `${file.originalname}.enc`;
       });
 
       const encryptedFiles = await Promise.all(encryptedFilesPromises);
 
-      res.status(200).json({
+      return res.status(200).json({
         message: 'Files uploaded and encrypted successfully',
         encryptedFiles,
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).send({ error: 'Error encrypting files' });
+      debug(error);
+      return res.status(500).send({ error: 'Error encrypting files' });
     }
   });
 };
 
 exports.downloadFile = async (req, res) => {
   const { filename } = req.params;
-  const filePath = path.resolve('uploads', filename + '.enc');
+  const filePath = path.resolve('uploads', `${filename}.enc`);
 
   try {
     if (!fs.existsSync(filePath)) {
@@ -80,7 +82,7 @@ exports.downloadFile = async (req, res) => {
     const key = crypto.scryptSync(process.env.SECRET_KEY, salt, 32);
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
 
-    res.setHeader('Content-Disposition', 'attachment; filename=' + path.basename(filename.replace('.enc', '')));
+    res.setHeader('Content-Disposition', `attachment; filename=${path.basename(filename.replace('.enc', ''))}`);
     res.setHeader('Content-Transfer-Encoding', 'binary');
 
     const decipherStream = new Readable({
@@ -91,10 +93,10 @@ exports.downloadFile = async (req, res) => {
       },
     });
 
-    await pipelineAsync(decipherStream, res);
+    return await pipelineAsync(decipherStream, res);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error downloading the file' });
+    debug(error);
+    return res.status(500).json({ error: 'Error downloading the file' });
   }
 };
 
@@ -118,14 +120,14 @@ exports.listFiles = (req, res) => {
       };
     });
 
-    res.status(200).json(fileList);
+    return res.status(200).json(fileList);
   });
 };
 
 exports.deleteFile = (req, res) => {
   const { filename } = req.params;
   // Assuming the filename provided does not have the .enc extension
-  const filePath = path.resolve('uploads', filename + '.enc');
+  const filePath = path.resolve('uploads', `${filename}.enc`);
 
   fs.access(filePath, (err) => {
     if (err) {
@@ -133,17 +135,19 @@ exports.deleteFile = (req, res) => {
         // File not found
         return res.status(404).json({ error: 'File not found' });
       }
-      console.error(err);
+      debug(err);
       return res.status(500).send({ error: 'Error accessing the file' });
     }
 
     // File exists, attempt to delete
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error(err);
+    fs.unlink(filePath, (errr) => {
+      if (errr) {
+        debug(errr);
         return res.status(500).send({ error: 'Error deleting the file' });
       }
-      res.status(200).json({ message: 'File deleted successfully' });
+      return res.status(200).json({ message: 'File deleted successfully' });
     });
+
+    return res.status(500).json({ error: 'An unknown error occurred' });
   });
 };
