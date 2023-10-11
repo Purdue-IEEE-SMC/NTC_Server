@@ -2,9 +2,9 @@ const express = require('express');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 
-const app = express();
-
 const fileRouter = require('./routes/files');
+
+const app = express();
 
 // Middlewares
 app.use(logger('dev'));
