@@ -13,7 +13,7 @@ git clone https://github.com/Purdue-IEEE-Neurotech-Committee/NTC_Server
 ```
 
 3. Open the folder in an IDE (Either VSCode or WebStorm)
-4. Run in terminal in the directory:
+4. Run in terminal in both the `/api` and `/client` folders:
 
 ```sh
 npm install
@@ -27,7 +27,7 @@ SECRET_KEY=<This is an encryption key. You can generate one here: https://genera
 DEBUG=ntc-server:*
 ```
 
-6. Start the server by running:
+6. Start the server by running in terminal in both the `/api` and `/client` folders:
 
 ```sh
 npm run start
