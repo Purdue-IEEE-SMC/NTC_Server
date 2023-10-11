@@ -39,6 +39,18 @@ components:
         refresh:
           $ref: '#/components/schemas/Token'
 
+    DataItem:
+      type: object
+      properties:
+        filename:
+          type: string
+        path:
+          type: string
+        size:
+          type: number
+        owner:
+          type: string
+
     Error:
       type: object
       properties:

@@ -59,7 +59,7 @@ const queryData = async (filter, options) => {
 const decryptAndDownloadData = async (filename) => {
   const file = await Data.findOne({ filename });
   if (!file) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Data not found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'File not found');
   }
 
   if (!fs.existsSync(file.path)) {

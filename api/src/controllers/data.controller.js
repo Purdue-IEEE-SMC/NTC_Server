@@ -41,7 +41,7 @@ const listData = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['filename', 'owner', 'size']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await dataService.queryData(filter, options);
-  res.send(result);
+  res.status(httpStatus.OK).send(result);
 });
 
 const getData = catchAsync(async (req, res) => {
