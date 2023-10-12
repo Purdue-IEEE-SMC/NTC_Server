@@ -47,7 +47,6 @@ module.exports = router;
  *         content:
  *           application/json:
  *             schema:
- *            schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/DataItem'
