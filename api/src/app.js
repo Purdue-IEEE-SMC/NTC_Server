@@ -18,9 +18,7 @@ app.use(helmet());
 // Use api routes
 app.use('/api', apiRoutes);
 
-// Serve static assets if in production
-if (config.env === 'production') {
-  app.use(express.static(path.join(__dirname, '../../client/build')));
-}
+// Serve react app for non-api routes
+app.use(express.static(path.join(__dirname, '../../client/build')));
 
 module.exports = app;
