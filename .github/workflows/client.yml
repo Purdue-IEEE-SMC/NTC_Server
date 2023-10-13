@@ -25,10 +25,10 @@ jobs:
           key: ${{ runner.os }}-cache
 
       - name: Install dependencies
-        run: npm i
+        run: yarn
 
       - name: Check formatting
-        run: npm run format:check
+        run: yarn run format:check
 
   lint:
     runs-on: ubuntu-latest
@@ -48,10 +48,10 @@ jobs:
           key: ${{ runner.os }}-cache
 
       - name: Install dependencies
-        run: npm i
+        run: yarn
 
       - name: Run linter
-        run: npm run lint
+        run: yarn run lint
 
   build:
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
           key: ${{ runner.os }}-cache
 
       - name: Install dependencies
-        run: npm i
+        run: yarn
 
       - name: Build application
-        run: npm run build
+        run: yarn run build
