@@ -2,7 +2,6 @@
 @import '~@catppuccin/palette/scss/mocha';
 
 $font-family-base: 'Poppins', sans-serif;
-$body-bg: $base;
 $primary: $mauve;
 $secondary: $blue;
 $success: $green;
@@ -11,9 +10,15 @@ $warning: $peach;
 $danger: $red;
 $light: $overlay2;
 $dark: $surface0;
+$body-bg: $base;
+$table-color: $text;
 
 @import '../../node_modules/bootstrap/scss/bootstrap';
 
-h1 {
+body {
+  color: $text;
+}
+
+.table {
   color: $text;
 }
