@@ -3,3 +3,4 @@ module.exports.emailService = require('./email.service');
 module.exports.tokenService = require('./token.service');
 module.exports.userService = require('./user.service');
 module.exports.dataService = require('./data.service');
+module.exports.fileService = require('./file.service');

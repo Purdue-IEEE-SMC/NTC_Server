@@ -17,7 +17,7 @@ const encryptAndSaveData = async (files, user) => {
 
   // Encrypt each file asynchronously
   const encryptedFilesPromises = files.map(async (file) => {
-    const outputPath = path.resolve('uploads', `${file.originalname}.enc`);
+    const outputPath = path.resolve('uploads', 'data', `${file.originalname}.enc`);
 
     // Generate a random IV and salt
     const iv = crypto.randomBytes(16);
@@ -103,6 +103,7 @@ const deleteDataById = async (filename, user) => {
   fs.access(file.path, async (err) => {
     if (err) {
       if (err.code === 'ENOENT') {
+        await file.remove();
         return null;
       }
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'An unknown error occurred');

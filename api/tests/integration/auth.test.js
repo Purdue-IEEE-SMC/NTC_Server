@@ -279,7 +279,10 @@ describe('Auth routes', () => {
       const isPasswordMatch = await bcrypt.compare('password2', dbUser.password);
       expect(isPasswordMatch).toBe(true);
 
-      const dbResetPasswordTokenCount = await Token.countDocuments({ user: userOne._id, type: tokenTypes.RESET_PASSWORD });
+      const dbResetPasswordTokenCount = await Token.countDocuments({
+        user: userOne._id,
+        type: tokenTypes.RESET_PASSWORD,
+      });
       expect(dbResetPasswordTokenCount).toBe(0);
     });
 
@@ -333,7 +336,10 @@ describe('Auth routes', () => {
       const resetPasswordToken = tokenService.generateToken(userOne._id, expires, tokenTypes.RESET_PASSWORD);
       await tokenService.saveToken(resetPasswordToken, userOne._id, expires, tokenTypes.RESET_PASSWORD);
 
-      await request(app).post('/v1/auth/reset-password').query({ token: resetPasswordToken }).expect(httpStatus.BAD_REQUEST);
+      await request(app)
+        .post('/v1/auth/reset-password')
+        .query({ token: resetPasswordToken })
+        .expect(httpStatus.BAD_REQUEST);
 
       await request(app)
         .post('/v1/auth/reset-password')
@@ -556,7 +562,9 @@ describe('Auth middleware', () => {
     await auth('anyRight')(req, httpMocks.createResponse(), next);
 
     expect(next).toHaveBeenCalledWith(expect.any(ApiError));
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: httpStatus.FORBIDDEN, message: 'Forbidden' }));
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: httpStatus.FORBIDDEN, message: 'Forbidden' })
+    );
   });
 
   test('should call next with no errors if user does not have required rights but userId is in params', async () => {

@@ -51,6 +51,18 @@ components:
         owner:
           type: string
 
+    File:
+      type: object
+      properties:
+        filename:
+          type: string
+        path:
+          type: string
+        size:
+          type: number
+        owner:
+          type: string
+
     Error:
       type: object
       properties:

@@ -32,7 +32,11 @@ const uploadData = catchAsync(async (req, res) => {
         res.status(httpStatus.CREATED).send({ result });
       })
       .catch((funcerr) => {
-        res.status(funcerr.statusCode).send(funcerr.message);
+        if (funcerr instanceof ApiError) {
+          res.status(funcerr.statusCode).send(funcerr.message);
+        } else {
+          res.status(httpStatus.INTERNAL_SERVER_ERROR).send("Couldn't upload file");
+        }
       });
   });
 });
