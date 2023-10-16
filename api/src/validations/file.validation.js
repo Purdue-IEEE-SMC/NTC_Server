@@ -17,14 +17,14 @@ const fileValidation = {
       .required(),
   },
 
-  listData: {
+  listFiles: {
     query: {
       limit: Joi.number().optional().min(1),
       page: Joi.number().optional().min(1),
     },
   },
 
-  getData: {
+  getFile: {
     params: {
       filename: Joi.string()
         .required()
@@ -32,7 +32,7 @@ const fileValidation = {
     },
   },
 
-  deleteData: {
+  deleteFile: {
     params: {
       filename: Joi.string()
         .required()
