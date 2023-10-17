@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 function Home() {
   return (
-    <div className="Home d-flex justify-content-center" style={{ paddingTop: '20vh' }}>
+    <div className="Home d-flex justify-content-center cssanimation fade-in-bottom" style={{ paddingTop: '20vh' }}>
       <div className="text-center">
         <div className="image-container"></div>
         <h1 className="display-5 fw-bold">NTC Server</h1>
