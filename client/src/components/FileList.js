@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Spinner, Table } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
-function FileList() {
+function FileList({ projectId }) {
   const [files, setFiles] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -11,7 +12,7 @@ function FileList() {
     const fetchFiles = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/v1/files');
+        const response = await fetch(`/api/v1/files/${projectId}`);
         const data = await response.json();
         setFiles(data);
         setLoading(false);
@@ -27,7 +28,6 @@ function FileList() {
   if (loading) {
     return (
       <div className="FileList">
-        <h3>File List</h3>
         <Spinner animation="border" />
       </div>
     );
@@ -36,7 +36,6 @@ function FileList() {
   if (error) {
     return (
       <div className="FileList">
-        <h3>File List</h3>
         <Alert variant="danger">An unknown error occurred while loading files.</Alert>
       </div>
     );
@@ -45,7 +44,6 @@ function FileList() {
   if (files.results.length > 0) {
     return (
       <div className="FileList">
-        <h3>File List</h3>
         <Table hover>
           <thead>
             <tr>
@@ -72,10 +70,13 @@ function FileList() {
 
   return (
     <div className="FileList">
-      <h3>File List</h3>
       <Alert variant="info">No files found.</Alert>
     </div>
   );
 }
+
+FileList.propTypes = {
+  projectId: PropTypes.string.isRequired,
+};
 
 export default FileList;

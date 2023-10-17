@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&family=VT323&display=swap';
 @import '~@catppuccin/palette/scss/mocha';
 
@@ -10,15 +11,39 @@ $warning: $peach;
 $danger: $red;
 $light: $overlay2;
 $dark: $surface0;
-$body-bg: $base;
-$table-color: $text;
+$light-text-emphasis-dark: $text;
+$dark-text-emphasis-dark: $subtext0;
+$light-bg-subtle-dark: $surface0;
+$dark-bg-subtle-dark: $mantle;
+$light-border-subtle-dark: $surface1;
+$dark-border-subtle-dark: $surface0;
+$body-color-dark: $text;
+$body-bg-dark: $base;
+$body-secondary-color-dark: $subtext1;
+$body-secondary-bg-dark: $surface0;
+$body-tertiary-color-dark: $subtext0;
+$body-tertiary-bg-dark: color.mix($surface0, $base, 50%);
+$body-emphasis-color-dark: $text;
+$border-color-dark: $surface1;
+$border-color-translucent-dark: rgba($text, 0.15);
+$headings-color-dark: inherit;
+$mark-bg-dark: $yellow;
+$form-switch-color-dark: rgba($text, 0.25) !default;
+$form-valid-color-dark: $green;
+$form-valid-border-color-dark: $green;
+$form-invalid-color-dark: $red;
+$form-invalid-border-color-dark: $red;
 
 @import '../../node_modules/bootstrap/scss/bootstrap';
 
-body {
-  color: $text;
-}
-
-.table {
-  color: $text;
+.image-container {
+  width: 300px;
+  height: 300px;
+  display: inline-block;
+  background: linear-gradient(45deg, $primary, $secondary);
+  position: relative;
+  max-width: 100%;
+  mask-image: url('../logo.png');
+  mask-size: cover;
+  mask-repeat: no-repeat;
 }
