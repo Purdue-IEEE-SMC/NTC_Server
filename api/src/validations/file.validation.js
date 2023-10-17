@@ -1,7 +1,12 @@
 const Joi = require('joi');
+const { objectId } = require('./custom.validation');
 
 const fileValidation = {
   uploadFile: {
+    params: {
+      projectId: Joi.string().custom(objectId).required(),
+    },
+    type: Joi.string().valid('data', 'model').required(),
     files: Joi.array()
       .items(
         Joi.object({
@@ -18,6 +23,9 @@ const fileValidation = {
   },
 
   listFiles: {
+    params: {
+      projectId: Joi.string().custom(objectId).required(),
+    },
     query: {
       limit: Joi.number().optional().min(1),
       page: Joi.number().optional().min(1),
@@ -26,17 +34,15 @@ const fileValidation = {
 
   getFile: {
     params: {
-      filename: Joi.string()
-        .required()
-        .regex(/^[\w,\s-]+\.[A-Za-z]{3,4}$/),
+      projectId: Joi.string().custom(objectId).required(),
+      filename: Joi.string().required(),
     },
   },
 
   deleteFile: {
     params: {
-      filename: Joi.string()
-        .required()
-        .regex(/^[\w,\s-]+\.[A-Za-z]{3,4}$/),
+      projectId: Joi.string().custom(objectId).required(),
+      filename: Joi.string().required(),
     },
   },
 };

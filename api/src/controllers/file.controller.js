@@ -18,12 +18,12 @@ const uploadFiles = catchAsync(async (req, res) => {
 });
 
 const listFiles = catchAsync(async (req, res) => {
-  const files = await fileService.queryFiles();
+  const files = await fileService.queryFiles(req.params.projectId);
   res.send(files);
 });
 
 const getFile = catchAsync(async (req, res) => {
-  const file = await fileService.getSingleFile(req.params.filename);
+  const file = await fileService.getFileByFilename(req.params.projectId, req.params.filename);
   res.setHeader('Content-Type', file.contentType);
   res.setHeader('Content-Disposition', `attachment; filename=${file.filename}`);
   const downloadStream = await fileService.getDownloadStream(file._id);
@@ -32,7 +32,7 @@ const getFile = catchAsync(async (req, res) => {
 });
 
 const deleteFile = catchAsync(async (req, res) => {
-  const file = await fileService.getSingleFile(req.params.filename);
+  const file = await fileService.getFileByFilename(req.params.projectId, req.params.filename);
   await fileService.deleteFile(file._id);
   res.status(httpStatus.NO_CONTENT).send();
 });
