@@ -19,13 +19,7 @@ git clone https://github.com/Purdue-IEEE-Neurotech-Committee/NTC_Server
 npm install
 ```
 
-5. Create a new file called `.env` in the current directory with the following information:
-
-```env
-PORT=3000
-SECRET_KEY=<This is an encryption key. You can generate one here: https://generate-random.org/encryption-key-generator?count=1&bytes=32&cipher=aes-256-cbc&string=&password=>
-DEBUG=ntc-server:*
-```
+5. Copy the `.env.example` file in the `/api` folder and rename it to `.env`
 
 6. Start the server by running in terminal in both the `/api` and `/client` folders:
 
