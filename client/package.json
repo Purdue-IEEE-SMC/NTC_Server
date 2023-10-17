@@ -6,7 +6,7 @@
     "prebuild": "yarn run build:clean",
     "build:clean": "rimraf ./build",
     "build": "react-scripts build",
-    "start": "react-scripts start",
+    "start": "PORT=5000 react-scripts start",
     "lint": "yarn run lint:eslint && yarn run lint:stylelint",
     "lint:fix": "yarn run lint:eslint:fix && yarn run lint:stylelint:fix",
     "lint:stylelint": "stylelint \"./src/**/*.{css,scss}\"",
