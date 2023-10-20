@@ -34,7 +34,7 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   name: Projects
+ *   name: ProjectsList
  *   description: Project management and retrieval
  */
 
@@ -44,7 +44,7 @@ module.exports = router;
  *   post:
  *     summary: Create a project
  *     description: Only admins can create other projects.
- *     tags: [Projects]
+ *     tags: [ProjectsList]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -77,7 +77,7 @@ module.exports = router;
  *   get:
  *     summary: Get all projects
  *     description: Users can retrieve all projects.
- *     tags: [Projects]
+ *     tags: [ProjectsList]
  *     parameters:
  *       - in: query
  *         name: name
@@ -135,7 +135,7 @@ module.exports = router;
  *   get:
  *     summary: Get a project
  *     description: Users can fetch other projects.
- *     tags: [Projects]
+ *     tags: [ProjectsList]
  *     parameters:
  *       - in: path
  *         name: id
@@ -156,7 +156,7 @@ module.exports = router;
  *   patch:
  *     summary: Update a project
  *     description: Only admins can update other projects.
- *     tags: [Projects]
+ *     tags: [ProjectsList]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -196,7 +196,7 @@ module.exports = router;
  *   delete:
  *     summary: Delete a project
  *     description: Only admins can delete other projects.
- *     tags: [Projects]
+ *     tags: [ProjectsList]
  *     security:
  *       - bearerAuth: []
  *     parameters:
