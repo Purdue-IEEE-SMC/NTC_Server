@@ -26,10 +26,13 @@ const fileValidation = {
     params: {
       projectId: Joi.string().custom(objectId).required(),
     },
-    query: {
-      limit: Joi.number().optional().min(1),
-      page: Joi.number().optional().min(1),
-    },
+    query: Joi.object().keys({
+      type: Joi.string().valid('data', 'model'),
+      uploaderId: Joi.string().custom(objectId),
+      sortBy: Joi.string(),
+      limit: Joi.number().integer(),
+      page: Joi.number().integer(),
+    }),
   },
 
   getFile: {

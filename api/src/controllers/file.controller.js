@@ -2,6 +2,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { fileService } = require('../services');
 const ApiError = require('../utils/ApiError');
+const pick = require('../utils/pick');
 
 const uploadFiles = catchAsync(async (req, res) => {
   fileService.upload.array('files', 10)(req, res, async (err) => {
@@ -18,7 +19,10 @@ const uploadFiles = catchAsync(async (req, res) => {
 });
 
 const listFiles = catchAsync(async (req, res) => {
-  const files = await fileService.queryFiles(req.params.projectId);
+  const filter = pick(req.query, ['type']);
+  filter.projectId = req.params.projectId;
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const files = await fileService.queryFiles(filter, options);
   res.send(files);
 });
 
