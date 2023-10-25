@@ -17,7 +17,6 @@ function ProjectsList() {
   if (projects.totalResults > 0) {
     return (
       <section className="projects-list">
-        <h1>Projects List</h1>
         <Table>
           <thead>
             <tr>

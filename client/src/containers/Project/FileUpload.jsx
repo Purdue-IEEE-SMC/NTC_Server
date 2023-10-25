@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Form } from 'react-bootstrap';
+import { Alert, Button, Form, Spinner } from 'react-bootstrap';
 import { useCreateFileMutation } from '../../services/files/filesApiSlice';
 
 FileUpload.propTypes = {
@@ -9,7 +9,7 @@ FileUpload.propTypes = {
 };
 
 function FileUpload({ projectId, type }) {
-  const [createFile, { isSuccess, isError, error }] = useCreateFileMutation();
+  const [createFile, { isSuccess, isError, error, isLoading }] = useCreateFileMutation();
   const [selectedFiles, setSelectedFiles] = useState([]);
   const uploadRef = useRef();
 
@@ -41,9 +41,10 @@ function FileUpload({ projectId, type }) {
         <Form.Label>Upload Files</Form.Label>
         <Form.Control ref={uploadRef} type="file" multiple onChange={handleFileChange} />
       </Form.Group>
-      <Button className="mb-3" onClick={handleFileUpload}>
+      <Button disabled={isLoading} className="mb-3" onClick={handleFileUpload}>
         Upload
       </Button>
+      {isLoading && <Spinner animation="border" role="status" />}
       {isSuccess && <Alert variant="info">File(s) uploaded successfully.</Alert>}
       {isError && <Alert variant="danger">Error: {error.data}</Alert>}
     </>

@@ -5,10 +5,10 @@ import RequireUnauth from '../services/auth/RequireUnauth';
 
 import Home from '../containers/Home/Home';
 import Login from '../containers/Login/Login';
-import ProjectsList from '../containers/ProjectsList/ProjectsList';
 import Project from '../containers/Project/Project';
 import NotFound from '../containers/NotFound/NotFound';
 import RequireAuth from '../services/auth/RequireAuth';
+import ProjectsPage from '../containers/ProjectsList/ProjectsPage';
 
 function AppRoutes() {
   return (
@@ -19,7 +19,7 @@ function AppRoutes() {
           <Route path="login" element={<Login />} />
         </Route>
         <Route element={<RequireAuth />}>
-          <Route path="projects" element={<ProjectsList />} />
+          <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/:projectId" element={<Project />} />
           <Route path="*" element={<NotFound />} />
         </Route>

@@ -7,12 +7,14 @@ export const projectApiSlice = apiSlice.injectEndpoints({
         url: '/projects',
         method: 'GET',
       }),
+      providesTags: ['Project'],
     }),
     getProject: builder.query({
       query: (projectId) => ({
         url: `/projects/${projectId}`,
         method: 'GET',
       }),
+      providesTags: ['Project'],
     }),
     createProject: builder.mutation({
       query: (project) => ({
@@ -20,6 +22,7 @@ export const projectApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: project,
       }),
+      invalidatesTags: ['Project'],
     }),
     updateProject: builder.mutation({
       query: ({ _id, ...changes }) => ({
@@ -27,12 +30,14 @@ export const projectApiSlice = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: changes,
       }),
+      invalidatesTags: ['Project'],
     }),
     deleteProject: builder.mutation({
       query: (projectId) => ({
         url: `/projects/${projectId}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Project'],
     }),
   }),
 });
