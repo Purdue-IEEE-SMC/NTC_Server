@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Download, Trash } from 'react-bootstrap-icons';
 import { useDeleteFileMutation, useGetFilesQuery } from '../../services/files/filesApiSlice';
 import './FileList.scss';
+import humanFileSize from '../../utils/humanFileSize';
 
 FileList.propTypes = {
   projectId: PropTypes.string.isRequired,
@@ -37,15 +38,15 @@ function FileList({ projectId, type }) {
             {files.results?.map((file) => (
               <tr key={file._id}>
                 <td>{file.filename}</td>
-                <td>{file.length}</td>
+                <td>{humanFileSize(file.length)}</td>
                 <td>
                   <a download href={`/api/v1/projects/${projectId}/files/${file.filename}`}>
-                    <button className="mx-1 action-button" type="submit">
+                    <button className="mx-1 action-button download-button" type="submit">
                       <Download />
                     </button>
                   </a>
                   <button
-                    className="mx-1 action-button"
+                    className="mx-1 action-button delete-button"
                     type="submit"
                     onClick={() => deleteFile({ projectId, filename: file.filename })}
                   >

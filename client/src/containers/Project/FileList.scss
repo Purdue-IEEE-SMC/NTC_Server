@@ -1,7 +1,18 @@
+@import '../../styles/variables.scss';
+
 .action-button {
   background: none;
   border: none;
   margin: 0;
   padding: 0;
   cursor: pointer;
+  color: $primary;
+}
+
+.download-button {
+  color: $info;
+}
+
+.delete-button {
+  color: $danger;
 }

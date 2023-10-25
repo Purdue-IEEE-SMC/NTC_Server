@@ -11,6 +11,8 @@ FileUpload.propTypes = {
 function FileUpload({ projectId, type }) {
   const [createFile, { isSuccess, isError, error, isLoading }] = useCreateFileMutation();
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [isFileError, setIsFileError] = useState(false);
+  const [isModified, setIsModified] = useState(false);
   const uploadRef = useRef();
 
   const handleFileUpload = async () => {
@@ -23,15 +25,20 @@ function FileUpload({ projectId, type }) {
       });
 
       await createFile({ projectId, formData });
+    } else {
+      setIsFileError(true);
     }
 
     setSelectedFiles([]);
     uploadRef.current.value = null;
+    setIsModified(false);
   };
 
   const handleFileChange = (event) => {
     if (event.target.files) {
+      setIsFileError(false);
       setSelectedFiles([...event.target.files]);
+      setIsModified(true);
     }
   };
 
@@ -39,13 +46,21 @@ function FileUpload({ projectId, type }) {
     <>
       <Form.Group controlId="formFileMultiple" className="mb-3">
         <Form.Label>Upload Files</Form.Label>
-        <Form.Control ref={uploadRef} type="file" multiple onChange={handleFileChange} />
+        <Form.Control
+          isValid={isSuccess && !isModified}
+          isInvalid={isFileError}
+          ref={uploadRef}
+          type="file"
+          multiple
+          onChange={handleFileChange}
+        />
+        <Form.Control.Feedback type="invalid">File is required</Form.Control.Feedback>
+        <Form.Control.Feedback type="valid">Files uploaded successfully</Form.Control.Feedback>
       </Form.Group>
       <Button disabled={isLoading} className="mb-3" onClick={handleFileUpload}>
         Upload
       </Button>
       {isLoading && <Spinner animation="border" role="status" />}
-      {isSuccess && <Alert variant="info">File(s) uploaded successfully.</Alert>}
       {isError && <Alert variant="danger">Error: {error.data}</Alert>}
     </>
   );
