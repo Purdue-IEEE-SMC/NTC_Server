@@ -118,7 +118,7 @@ const queryFiles = async (filter, options) => {
 };
 
 const getFileById = async (projectId, fileId) => {
-  const file = await getColl().findOne({ _id: fileId, 'metadata.projectId': projectId });
+  const file = await getColl().findOne({ _id: fileId, 'metadata.projectId': mongoose.Types.ObjectId(projectId) });
   if (!file) {
     throw new ApiError(httpStatus.NOT_FOUND, 'File not found');
   }
@@ -126,7 +126,7 @@ const getFileById = async (projectId, fileId) => {
 };
 
 const getFileByFilename = async (projectId, filename) => {
-  const file = await getColl().findOne({ filename, 'metadata.projectId': projectId });
+  const file = await getColl().findOne({ filename, 'metadata.projectId': mongoose.Types.ObjectId(projectId) });
   if (!file) {
     throw new ApiError(httpStatus.NOT_FOUND, 'File not found');
   }

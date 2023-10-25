@@ -1,78 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, Spinner, Table } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Alert, Button, Spinner, Table } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { Download, Trash } from 'react-bootstrap-icons';
+import { useCreateFileMutation, useDeleteFileMutation, useGetFilesQuery } from '../../services/files/filesApiSlice';
 
 function FileList({ projectId }) {
-  const [files, setFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: files, isLoading, isError, error } = useGetFilesQuery(projectId);
+  const [createFile] = useCreateFileMutation();
+  const [deleteFile] = useDeleteFileMutation();
 
-  useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/v1/files/${projectId}`);
-        const data = await response.json();
-        setFiles(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err);
-        setLoading(false);
-      }
-    };
+  const handleFileChange = (event) => {
+    if (event.target.files) {
+      setSelectedFiles([...event.target.files]);
+    }
+  };
+  const handleFileUpload = async () => {
+    if (selectedFiles.length > 0) {
+      const formData = new FormData();
+      formData.append('type', 'data');
 
-    fetchFiles();
-  }, []);
+      selectedFiles.forEach((file) => {
+        formData.append('files', file);
+      });
 
-  if (loading) {
-    return (
-      <div className="FileList">
-        <Spinner animation="border" />
-      </div>
-    );
+      await createFile({ projectId, formData });
+    }
+  };
+
+  if (isLoading) {
+    return <Spinner animation="border" role="status" />;
   }
 
-  if (error) {
-    return (
-      <div className="FileList">
-        <Alert variant="danger">An unknown error occurred while loading files.</Alert>
-      </div>
-    );
+  if (isError) {
+    return <Alert variant="danger">{error}</Alert>;
   }
 
-  if (files.results.length > 0) {
+  if (files.totalResults > 0) {
     return (
-      <div className="FileList">
-        <Table hover>
+      <section className="files-list">
+        <h1>Files List</h1>
+        <Table>
           <thead>
             <tr>
-              <th>Filename</th>
-              <th>Owner</th>
+              <th>Name</th>
               <th>Size</th>
+              <th>Type</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {files.results.map((file) => (
-              <tr key={file.id}>
+            {files.results?.map((file) => (
+              <tr key={file._id}>
                 <td>{file.filename}</td>
-                <td>{file.owner}</td>
-                <td>{file.size}</td>
-                <td>temp</td>
+                <td>{file.length}</td>
+                <td>{file.metadata.type}</td>
+                <td>
+                  <a download href={`/api/v1/projects/${projectId}/files/${file.filename}`}>
+                    <Download />
+                  </a>
+                  <button
+                    type="submit"
+                    onClick={() => deleteFile({ projectId, filename: file.filename })}
+                    className="mx-2"
+                  >
+                    <Trash />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </Table>
-      </div>
+        <div>
+          <input type="file" multiple onChange={handleFileChange} />
+          <Button onClick={handleFileUpload}>Upload</Button>
+        </div>
+      </section>
     );
   }
 
-  return (
-    <div className="FileList">
-      <Alert variant="info">No files found.</Alert>
-    </div>
-  );
+  return <p>No files were found...</p>;
 }
 
 FileList.propTypes = {

@@ -4,7 +4,7 @@ import { setTokens, logout } from '../auth/authSlice';
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api/v1',
   prepareHeaders: (headers, { getState }) => {
-    const token = getState().auth.authTokens?.access;
+    const { token } = getState().auth.tokens.access;
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
@@ -15,17 +15,16 @@ const baseQuery = fetchBaseQuery({
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result?.error?.originalStatus === 401) {
+  if (result?.error?.status === 401) {
     const refreshResult = await baseQuery(
       {
         url: '/auth/refresh-tokens',
         method: 'POST',
-        body: { refreshToken: api.getState().auth.authTokens.refresh },
+        body: { refreshToken: api.getState().auth.tokens.refresh.token },
       },
       api,
       extraOptions,
     );
-
     if (refreshResult?.data) {
       api.dispatch(setTokens(refreshResult.data));
       result = await baseQuery(args, api, extraOptions);

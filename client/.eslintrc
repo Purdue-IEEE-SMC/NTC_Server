@@ -67,6 +67,7 @@
     "no-param-reassign": ["error", { "props": false }],
     "no-unused-vars": 2,
     "no-use-before-define": 0,
+    "no-underscore-dangle": "off",
     "prefer-template": 2,
     "react/destructuring-assignment": 0,
     "react-hooks/rules-of-hooks": "error",

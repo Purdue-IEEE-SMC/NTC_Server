@@ -8,6 +8,7 @@ import Login from '../containers/Login/Login';
 import ProjectsList from '../containers/ProjectsList/ProjectsList';
 import Project from '../containers/Project/Project';
 import NotFound from '../containers/NotFound/NotFound';
+import RequireAuth from '../services/auth/RequireAuth';
 
 function AppRoutes() {
   return (
@@ -17,9 +18,11 @@ function AppRoutes() {
         <Route element={<RequireUnauth />}>
           <Route path="login" element={<Login />} />
         </Route>
-        <Route path="projects" element={<ProjectsList />} />
-        <Route path="projects/:projectId" element={<Project />} />
-        <Route path="*" element={<NotFound />} />
+        <Route element={<RequireAuth />}>
+          <Route path="projects" element={<ProjectsList />} />
+          <Route path="projects/:projectId" element={<Project />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
       </Routes>
     </Router>
   );
