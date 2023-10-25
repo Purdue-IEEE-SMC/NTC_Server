@@ -20,17 +20,19 @@ function ProjectsList() {
         <Table>
           <thead>
             <tr>
-              <th>#</th>
               <th>Name</th>
+              <th>Data files</th>
+              <th>Model files</th>
             </tr>
           </thead>
           <tbody>
             {projects.results?.map((project) => (
               <tr key={project.id}>
-                <td>{project.id}</td>
                 <td>
                   <Link to={`/projects/${project.id}`}>{project.name}</Link>
                 </td>
+                <td>{project.dataFileCount}</td>
+                <td>{project.modelFileCount}</td>
               </tr>
             ))}
           </tbody>

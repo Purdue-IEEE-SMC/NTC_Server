@@ -30,6 +30,21 @@ projectSchema.statics.isNameTaken = async function (name, excludeProjectId) {
   return !!project;
 };
 
+projectSchema.virtual('fileCount').get(function () {
+  const coll = mongoose.connection.db.collection('files.files');
+  return coll.countDocuments({ 'metadata.projectId': this._id });
+});
+
+projectSchema.virtual('dataFileCount').get(function () {
+  const coll = mongoose.connection.db.collection('files.files');
+  return coll.countDocuments({ 'metadata.projectId': this._id, 'metadata.type': 'data' });
+});
+
+projectSchema.virtual('modelFileCount').get(function () {
+  const coll = mongoose.connection.db.collection('files.files');
+  return coll.countDocuments({ 'metadata.projectId': this._id, 'metadata.type': 'model' });
+});
+
 /**
  * @typedef Project
  */

@@ -13,6 +13,15 @@ const getProjects = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'role']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await projectService.queryProjects(filter, options);
+  result.results = await Promise.all(
+    result.results.map(async (project) => {
+      const projectObj = project.toJSON();
+      projectObj.fileCount = await project.fileCount;
+      projectObj.dataFileCount = await project.dataFileCount;
+      projectObj.modelFileCount = await project.modelFileCount;
+      return projectObj;
+    })
+  );
   res.send(result);
 });
 
@@ -21,7 +30,13 @@ const getProject = catchAsync(async (req, res) => {
   if (!project) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
   }
-  res.send(project);
+
+  const projectObj = project.toJSON();
+  projectObj.fileCount = await project.fileCount;
+  projectObj.dataFileCount = await project.dataFileCount;
+  projectObj.modelFileCount = await project.modelFileCount;
+
+  res.send(projectObj);
 });
 
 const updateProject = catchAsync(async (req, res) => {
