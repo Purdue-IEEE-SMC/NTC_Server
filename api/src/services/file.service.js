@@ -33,7 +33,7 @@ const paginateFile = async (filter, options) => {
       sort[key] = order === 'desc' ? -1 : 1;
     });
   } else {
-    sort = { uploadDate: 1 }; // Default to ascending order for uploadDate
+    sort = { uploadDate: -1 };
   }
 
   const limit = options.limit && parseInt(options.limit, 10) > 0 ? parseInt(options.limit, 10) : 10;
