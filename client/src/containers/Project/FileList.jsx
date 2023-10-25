@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button, Modal, Spinner, Table } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { Download, Trash } from 'react-bootstrap-icons';
+import { PaginationControl } from 'react-bootstrap-pagination-control';
 import { useDeleteFileMutation, useGetFilesQuery } from '../../services/files/filesApiSlice';
 import './FileList.scss';
 import humanFileSize from '../../utils/humanFileSize';
@@ -12,7 +13,8 @@ FileList.propTypes = {
 };
 
 function FileList({ projectId, type }) {
-  const { data: files, isLoading, isError, error } = useGetFilesQuery({ projectId, type });
+  const [page, setPage] = useState(1);
+  const { data: files, isLoading, isError, error } = useGetFilesQuery({ projectId, params: { type, page } });
   const [deleteFile] = useDeleteFileMutation();
   const [show, setShow] = useState(false);
 
@@ -83,6 +85,15 @@ function FileList({ projectId, type }) {
             ))}
           </tbody>
         </Table>
+        <p>Total files: {files.totalResults}</p>
+        {files.totalPages > 1 && (
+          <PaginationControl
+            total={files.totalResults}
+            limit={files.limit}
+            page={page}
+            changePage={(num) => setPage(num)}
+          ></PaginationControl>
+        )}
       </section>
     );
   }

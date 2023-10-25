@@ -1,10 +1,12 @@
 import React from 'react';
 import { Alert, Spinner, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { PaginationControl } from 'react-bootstrap-pagination-control';
 import { useGetProjectsQuery } from '../../services/project/projectApiSlice';
 
 function ProjectsList() {
-  const { data: projects, isLoading, isError, error } = useGetProjectsQuery();
+  const [page, setPage] = React.useState(1);
+  const { data: projects, isLoading, isError, error } = useGetProjectsQuery({ params: { page } });
 
   if (isLoading) {
     return <Spinner animation="border" role="status" />;
@@ -37,6 +39,14 @@ function ProjectsList() {
             ))}
           </tbody>
         </Table>
+        {projects.totalPages > 1 && (
+          <PaginationControl
+            total={projects.totalResults}
+            limit={projects.limit}
+            page={page}
+            changePage={(num) => setPage(num)}
+          ></PaginationControl>
+        )}
       </section>
     );
   }

@@ -3,9 +3,9 @@ import { apiSlice } from '../api/apiSlice';
 export const filesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getFiles: builder.query({
-      query: ({ projectId, type }) => ({
-        url: type ? `/projects/${projectId}/files?type=${type}` : `/projects/${projectId}/files`,
-        method: 'GET',
+      query: ({ projectId, params = {} }) => ({
+        url: `/projects/${projectId}/files`,
+        params,
       }),
       providesTags: ['File'],
     }),

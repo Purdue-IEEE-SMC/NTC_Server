@@ -3109,7 +3109,7 @@ bootstrap-icons@^1.11.1:
   resolved "https://registry.npmjs.org/bootstrap-icons/-/bootstrap-icons-1.11.1.tgz"
   integrity sha512-F0DDp7nKUX+x/QtpfRZ+XHFya60ng9nfdpdS59vDDfs4Uhuxp7zym/QavMsu/xx51txkoM9eVmpE7D08N35blw==
 
-bootstrap@^5.3.2:
+bootstrap@^5.2.1, bootstrap@^5.3.2:
   version "5.3.2"
   resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-5.3.2.tgz"
   integrity sha512-D32nmNWiQHo94BKHLmOrdjlL05q1c8oxbtBphQFb9Z5to6eGRDCm0QgeaZ4zFBHzfg2++rqa2JkqCcxDy0sH0g==
@@ -8130,6 +8130,32 @@ react-bootstrap-icons@^1.10.3:
   integrity sha512-j4hSby6gT9/enhl3ybB1tfr1slZNAYXDVntcRrmVjxB3//2WwqrzpESVqKhyayYVaWpEtnwf9wgUQ03cuziwrw==
   dependencies:
     prop-types "^15.7.2"
+
+react-bootstrap-pagination-control@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/react-bootstrap-pagination-control/-/react-bootstrap-pagination-control-1.0.5.tgz#8b6117d7856e7ea5e396c7aa3f10e2adb5c9422c"
+  integrity sha512-6OW9NUz0CAYLZ3hBEBWkxEgHggGo/RcxW+Owo0D2FUkgwtWyDEH40gSwZf0hX3r36vl5WfOg1VYkzLPMv3Rqbw==
+  dependencies:
+    bootstrap "^5.2.1"
+    react-bootstrap "^2.5.0"
+
+react-bootstrap@^2.5.0:
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-2.9.1.tgz#c1ab48ae2b2cfe6d5ac957c2042eb36fcafdb1d2"
+  integrity sha512-ezgmh/ARCYp18LbZEqPp0ppvy+ytCmycDORqc8vXSKYV3cer4VH7OReV8uMOoKXmYzivJTxgzGHalGrHamryHA==
+  dependencies:
+    "@babel/runtime" "^7.22.5"
+    "@restart/hooks" "^0.4.9"
+    "@restart/ui" "^1.6.6"
+    "@types/react-transition-group" "^4.4.6"
+    classnames "^2.3.2"
+    dom-helpers "^5.2.1"
+    invariant "^2.2.4"
+    prop-types "^15.8.1"
+    prop-types-extra "^1.1.0"
+    react-transition-group "^4.4.5"
+    uncontrollable "^7.2.1"
+    warning "^4.0.3"
 
 react-bootstrap@^2.9.0:
   version "2.9.0"
