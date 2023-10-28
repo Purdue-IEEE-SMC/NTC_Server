@@ -16,7 +16,9 @@ function FileList({ projectId, type }) {
   const [page, setPage] = useState(1);
   const { data: files, isLoading, isError, error } = useGetFilesQuery({ projectId, params: { type, page } });
   const [deleteFile] = useDeleteFileMutation();
+
   const [show, setShow] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
 
   const handleDeleteFile = (filename) => {
     setToDelete(filename);
@@ -29,10 +31,10 @@ function FileList({ projectId, type }) {
     setToDelete(null);
   };
 
-  const [toDelete, setToDelete] = useState(null);
   if (isLoading) {
     return <Spinner animation="border" role="status" />;
   }
+
   if (isError) {
     return <Alert variant="danger">Error: {error?.data?.message}</Alert>;
   }
