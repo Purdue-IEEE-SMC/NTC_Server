@@ -81,7 +81,7 @@ jobs:
 
       - name: Setup env
         run: |
-          echo .env.example > .env
+          mv .env.example .env
 
       - name: Run test
         run: yarn test
