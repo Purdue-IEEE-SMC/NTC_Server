@@ -9,17 +9,16 @@ const logger = require('./config/logger');
 
 const app = express();
 
-mongoose
-  .connect(config.mongoose.url, config.mongoose.options)
-  .then(() => {
-    logger.info('Connected to MongoDB');
-  })
-  .catch((err) => {
-    logger.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
-
 if (config.env !== 'test') {
+  mongoose
+    .connect(config.mongoose.url, config.mongoose.options)
+    .then(() => {
+      logger.info('Connected to MongoDB');
+    })
+    .catch((err) => {
+      logger.error('MongoDB connection error:', err);
+      process.exit(1);
+    });
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }

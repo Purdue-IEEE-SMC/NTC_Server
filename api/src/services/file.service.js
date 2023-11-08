@@ -3,11 +3,57 @@ const multer = require('multer');
 const mongoose = require('mongoose');
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
-const config = require('../config/config');
 const projectService = require('./project.service');
 
 let bucket;
 let coll;
+let upload;
+
+const setupUpload = () => {
+  const storage = new GridFsStorage({
+    db: mongoose.connection, // Would like to use existing connection
+    file: async (req, file) => {
+      return {
+        filename: `${Date.now()}-${file.originalname}`,
+        bucketName: 'files',
+        metadata: {
+          uploaderId: req.user._id,
+          projectId: mongoose.Types.ObjectId(req.params.projectId),
+          type: req.body.type,
+        },
+      };
+    },
+  });
+
+  upload = multer({
+    storage,
+    fileFilter: async (req, file, callback) => {
+      let project;
+      try {
+        project = await projectService.getProjectById(req.params.projectId);
+      } catch (error) {
+        return callback(new ApiError(httpStatus.NOT_FOUND, 'Project not found'));
+      }
+      if (!project) {
+        return callback(new ApiError(httpStatus.NOT_FOUND, 'Project not found'));
+      }
+      if (!req.body.type || !(req.body.type === 'data' || req.body.type === 'model')) {
+        return callback(new ApiError(httpStatus.BAD_REQUEST, 'Invalid type'));
+      }
+      if (req.body.type === 'data' && file.mimetype !== 'text/csv') {
+        return callback(new ApiError(httpStatus.BAD_REQUEST, 'Data files must be CSV'));
+      }
+      if (req.body.type === 'model' && !file.originalname.match(/\.(keras|ckpt)$/)) {
+        return callback(new ApiError(httpStatus.BAD_REQUEST, 'Invalid model file type'));
+      }
+      return callback(null, true);
+    },
+  });
+};
+
+mongoose.connection.on('connected', () => {
+  setupUpload();
+});
 
 /**
  * Get files GridFS Bucket
@@ -90,54 +136,6 @@ const paginateFile = async (filter, options) => {
     return Promise.resolve(result);
   });
 };
-
-/**
- * GridFS Storage
- * @type {GridFsStorage}
- */
-const storage = new GridFsStorage({
-  url: config.mongoose.url, // Would like to use existing connection
-  file: async (req, file) => {
-    return {
-      filename: `${Date.now()}-${file.originalname}`,
-      bucketName: 'files',
-      metadata: {
-        uploaderId: req.user._id,
-        projectId: mongoose.Types.ObjectId(req.params.projectId),
-        type: req.body.type,
-      },
-    };
-  },
-});
-
-/**
- * Multer upload
- * @type {multer.Multer}
- */
-const upload = multer({
-  storage,
-  fileFilter: async (req, file, callback) => {
-    let project;
-    try {
-      project = await projectService.getProjectById(req.params.projectId);
-    } catch (error) {
-      return callback(new ApiError(httpStatus.NOT_FOUND, 'Project not found'));
-    }
-    if (!project) {
-      return callback(new ApiError(httpStatus.NOT_FOUND, 'Project not found'));
-    }
-    if (!req.body.type || !(req.body.type === 'data' || req.body.type === 'model')) {
-      return callback(new ApiError(httpStatus.BAD_REQUEST, 'Invalid type'));
-    }
-    if (req.body.type === 'data' && file.mimetype !== 'text/csv') {
-      return callback(new ApiError(httpStatus.BAD_REQUEST, 'Data files must be CSV'));
-    }
-    if (req.body.type === 'model' && !file.originalname.match(/\.(keras|ckpt)$/)) {
-      return callback(new ApiError(httpStatus.BAD_REQUEST, 'Invalid model file type'));
-    }
-    return callback(null, true);
-  },
-});
 
 /**
  * Query for files with pagination
@@ -233,7 +231,12 @@ const deleteFilesByProjectId = async (projectId) => {
 };
 
 module.exports = {
-  upload,
+  get upload() {
+    if (!upload) {
+      throw new ApiError(httpStatus.SERVICE_UNAVAILABLE, 'File upload service unavailable');
+    }
+    return upload;
+  },
   queryFiles,
   getFileById,
   getFileByFilename,
