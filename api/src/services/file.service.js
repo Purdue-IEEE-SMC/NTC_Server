@@ -155,6 +155,21 @@ const deleteFile = async (id) => {
   });
 };
 
+const deleteFilesByProjectId = async (projectId) => {
+  const files = await getColl()
+    .find({ 'metadata.projectId': mongoose.Types.ObjectId(projectId) })
+    .toArray();
+  await Promise.all(
+    files.map((file) =>
+      deleteFile(file._id).catch((err) => {
+        if (err) {
+          throw new ApiError(httpStatus.NOT_FOUND, 'Error deleting file');
+        }
+      })
+    )
+  );
+};
+
 module.exports = {
   upload,
   queryFiles,
@@ -162,4 +177,5 @@ module.exports = {
   getFileByFilename,
   getDownloadStream,
   deleteFile,
+  deleteFilesByProjectId,
 };

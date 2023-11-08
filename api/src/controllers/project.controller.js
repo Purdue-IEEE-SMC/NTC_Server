@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { projectService } = require('../services');
+const { projectService, fileService } = require('../services');
 
 const createProject = catchAsync(async (req, res) => {
   const project = await projectService.createProject(req.body);
@@ -45,6 +45,7 @@ const updateProject = catchAsync(async (req, res) => {
 });
 
 const deleteProject = catchAsync(async (req, res) => {
+  await fileService.deleteFilesByProjectId(req.params.projectId);
   await projectService.deleteProjectById(req.params.projectId);
   res.status(httpStatus.NO_CONTENT).send();
 });
