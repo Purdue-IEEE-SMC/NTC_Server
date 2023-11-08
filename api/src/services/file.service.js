@@ -9,6 +9,10 @@ const projectService = require('./project.service');
 let bucket;
 let coll;
 
+/**
+ * Get files GridFS Bucket
+ * @returns {GridFSBucket}
+ */
 const getBucket = () => {
   if (!bucket) {
     return new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
@@ -18,6 +22,10 @@ const getBucket = () => {
   return bucket;
 };
 
+/**
+ * Get files GridFS Collection
+ * @returns {Collection<DefaultSchema>}
+ */
 const getColl = () => {
   if (!coll) {
     return mongoose.connection.db.collection('files.files');
@@ -25,6 +33,16 @@ const getColl = () => {
   return coll;
 };
 
+/**
+ * Query for documents with pagination
+ * @param {Object} [filter] - Mongo filter
+ * @param {Object} [options] - Query options
+ * @param {string} [options.sortBy] - Sorting criteria using the format: sortField:(desc|asc). Multiple sorting criteria should be separated by commas (,)
+ * @param {string} [options.populate] - Populate data fields. Hierarchy of fields should be separated by (.). Multiple populating criteria should be separated by commas (,)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<QueryResult>}
+ */
 const paginateFile = async (filter, options) => {
   let sort = {};
   if (options.sortBy) {
@@ -73,6 +91,10 @@ const paginateFile = async (filter, options) => {
   });
 };
 
+/**
+ * GridFS Storage
+ * @type {GridFsStorage}
+ */
 const storage = new GridFsStorage({
   url: config.mongoose.url, // Would like to use existing connection
   file: async (req, file) => {
@@ -88,6 +110,10 @@ const storage = new GridFsStorage({
   },
 });
 
+/**
+ * Multer upload
+ * @type {multer.Multer}
+ */
 const upload = multer({
   storage,
   fileFilter: async (req, file, callback) => {
@@ -113,10 +139,25 @@ const upload = multer({
   },
 });
 
+/**
+ * Query for files with pagination
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<QueryResult>}
+ */
 const queryFiles = async (filter, options) => {
   return paginateFile(filter, options);
 };
 
+/**
+ * Get file by id
+ * @param {ObjectId} projectId
+ * @param {ObjectId} fileId
+ * @returns {Promise<any>}
+ */
 const getFileById = async (projectId, fileId) => {
   const file = await getColl().findOne({ _id: fileId, 'metadata.projectId': mongoose.Types.ObjectId(projectId) });
   if (!file) {
@@ -125,6 +166,12 @@ const getFileById = async (projectId, fileId) => {
   return file;
 };
 
+/**
+ *
+ * @param projectId
+ * @param filename
+ * @returns {Promise<any>}
+ */
 const getFileByFilename = async (projectId, filename) => {
   const file = await getColl().findOne({ filename, 'metadata.projectId': mongoose.Types.ObjectId(projectId) });
   if (!file) {
@@ -133,6 +180,11 @@ const getFileByFilename = async (projectId, filename) => {
   return file;
 };
 
+/**
+ * Get download stream
+ * @param {ObjectId} id
+ * @returns {Promise<GridFSBucketReadStream>}
+ */
 const getDownloadStream = async (id) => {
   let downloadStream;
   try {
@@ -147,6 +199,11 @@ const getDownloadStream = async (id) => {
   return downloadStream;
 };
 
+/**
+ * Delete file by id
+ * @param {ObjectId} id
+ * @returns {Promise<void>}
+ */
 const deleteFile = async (id) => {
   await getBucket().delete(id, (err) => {
     if (err) {
@@ -155,6 +212,11 @@ const deleteFile = async (id) => {
   });
 };
 
+/**
+ * Delete all files by project id
+ * @param {ObjectId} projectId
+ * @returns {Promise<void>}
+ */
 const deleteFilesByProjectId = async (projectId) => {
   const files = await getColl()
     .find({ 'metadata.projectId': mongoose.Types.ObjectId(projectId) })
