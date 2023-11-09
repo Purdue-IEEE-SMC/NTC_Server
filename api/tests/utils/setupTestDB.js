@@ -10,6 +10,11 @@ const setupTestDB = () => {
     await Promise.all(
       Object.values(mongoose.connection.collections).map(async (collection) => collection.deleteMany())
     );
+    const files = await mongoose.connection.db.collection('files.files').find({}).toArray();
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: 'files',
+    });
+    await Promise.all(files.map((file) => bucket.delete(file._id)));
   });
 
   afterAll(async () => {

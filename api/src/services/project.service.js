@@ -38,15 +38,6 @@ const getProjectById = async (id) => {
 };
 
 /**
- * Get project by name
- * @param {string} name
- * @returns {Promise<Project>}
- */
-const getProjectByName = async (name) => {
-  return Project.findOne({ name });
-};
-
-/**
  * Update project by id
  * @param {ObjectId} projectId
  * @param {Object} updateBody
@@ -83,7 +74,6 @@ module.exports = {
   createProject,
   queryProjects,
   getProjectById,
-  getProjectByName,
   updateProjectById,
   deleteProjectById,
 };
