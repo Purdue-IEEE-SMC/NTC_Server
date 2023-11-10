@@ -1,14 +1,21 @@
 const request = require('supertest');
 const faker = require('faker');
 const httpStatus = require('http-status');
+const mongoose = require('mongoose');
 const app = require('../../src/app');
 const setupTestDB = require('../utils/setupTestDB');
 const { Project } = require('../../src/models');
 const { userOne, admin, insertUsers } = require('../fixtures/user.fixture');
 const { userOneAccessToken, adminAccessToken } = require('../fixtures/token.fixture');
 const { projectOne, insertProjects, projectTwo, projectThree } = require('../fixtures/project.fixture');
+const { insertFiles, dataOne, dataTwo, modelOne, modelTwo } = require('../fixtures/file.fixture');
 
 setupTestDB();
+let filesCollection;
+
+beforeAll(async () => {
+  filesCollection = await mongoose.connection.db.collection('files.files');
+});
 
 describe('Project routes', () => {
   describe('POST /api/v1/projects', () => {
@@ -100,6 +107,22 @@ describe('Project routes', () => {
         fileCount: 0,
         modelFileCount: 0,
         dataFileCount: 0,
+      });
+    });
+
+    test('should show fileCount, modelFileCount, dataFileCount', async () => {
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app).get('/api/v1/projects').expect(httpStatus.OK);
+
+      expect(res.body.results).toHaveLength(1);
+      expect(res.body.results[0]).toEqual({
+        id: projectOne._id.toHexString(),
+        name: projectOne.name,
+        fileCount: 4,
+        modelFileCount: 2,
+        dataFileCount: 2,
       });
     });
 
@@ -227,6 +250,22 @@ describe('Project routes', () => {
 
       const dbProject = await Project.findById(projectOne._id);
       expect(dbProject).toBeNull();
+    });
+
+    test('should delete all files in project', async () => {
+      await insertUsers([admin]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      await request(app)
+        .delete(`/api/v1/projects/${projectOne._id}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .expect(httpStatus.NO_CONTENT);
+
+      const dbProject = await Project.findById(projectOne._id);
+      expect(dbProject).toBeNull();
+      const dbFiles = await filesCollection.find({ 'metadata.projectId': projectOne._id }).toArray();
+      expect(dbFiles).toHaveLength(0);
     });
 
     test('should return 401 error if access token is missing', async () => {
