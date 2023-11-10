@@ -19,7 +19,7 @@ const uploadFiles = catchAsync(async (req, res) => {
 });
 
 const listFiles = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['type']);
+  const filter = pick(req.query, ['type', 'filename', 'uploaderId', 'size']);
   filter.projectId = req.params.projectId;
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const files = await fileService.queryFiles(filter, options);

@@ -4,10 +4,18 @@ const httpStatus = require('http-status');
 const mongoose = require('mongoose');
 const app = require('../../src/app');
 const setupTestDB = require('../utils/setupTestDB');
-const { userOne, insertUsers } = require('../fixtures/user.fixture');
-const { userOneAccessToken } = require('../fixtures/token.fixture');
-const { projectOne, insertProjects } = require('../fixtures/project.fixture');
-const { genDataFile } = require('../fixtures/file.fixture');
+const { userOne, insertUsers, userTwo, admin } = require('../fixtures/user.fixture');
+const { userOneAccessToken, adminAccessToken } = require('../fixtures/token.fixture');
+const { projectOne, insertProjects, projectTwo } = require('../fixtures/project.fixture');
+const {
+  genDataFile,
+  insertFiles,
+  dataOne,
+  dataTwo,
+  modelOne,
+  modelTwo,
+  genFilenameRegex,
+} = require('../fixtures/file.fixture');
 
 setupTestDB();
 let filesCollection;
@@ -38,9 +46,7 @@ describe('File routes', () => {
 
       expect(res.body).toHaveProperty('files');
       expect(res.body.files).toEqual(expect.any(Array));
-      // eslint-disable-next-line security/detect-non-literal-regexp
-      const filenameRegex = new RegExp(`^\\d+-${newFile.originalname.replace(/\./g, '\\.')}$`);
-      expect(res.body.files[0]).toEqual(expect.stringMatching(filenameRegex));
+      expect(res.body.files[0]).toEqual(expect.stringMatching(genFilenameRegex(newFile.originalname)));
 
       const dbFile = await filesCollection.findOne({ filename: res.body.files[0] });
       expect({
@@ -81,13 +87,11 @@ describe('File routes', () => {
       expect(res.body).toHaveProperty('files');
       expect(res.body.files).toEqual(expect.any(Array));
       expect(res.body.files).toHaveLength(3);
-      // eslint-disable-next-line security/detect-non-literal-regexp
-      const genRegex = (filename) => new RegExp(`^\\d+-${filename.replace(/\./g, '\\.')}$`);
       expect(res.body.files).toEqual(
         expect.arrayContaining([
-          expect.stringMatching(genRegex(newFile.originalname)),
-          expect.stringMatching(genRegex(newFile2.originalname)),
-          expect.stringMatching(genRegex(newFile3.originalname)),
+          expect.stringMatching(genFilenameRegex(newFile.originalname)),
+          expect.stringMatching(genFilenameRegex(newFile2.originalname)),
+          expect.stringMatching(genFilenameRegex(newFile3.originalname)),
         ])
       );
 
@@ -219,6 +223,446 @@ describe('File routes', () => {
         .field('type', 'data')
         .attach('files', newFile.buffer, newFile.originalname)
         .expect(httpStatus.UNAUTHORIZED);
+    });
+
+    test('should return 404 error if project is not found', async () => {
+      await insertUsers([userOne]);
+
+      await request(app)
+        .post(`/api/v1/projects/${projectOne._id}/files`)
+        .set('Authorization', `Bearer ${userOneAccessToken}`)
+        .set('Content-Type', 'multipart/form-data')
+        .field('type', 'data')
+        .attach('files', newFile.buffer, newFile.originalname)
+        .expect(httpStatus.NOT_FOUND);
+    });
+
+    test('should return 404 error if project is unspecificed', async () => {
+      await insertUsers([userOne]);
+
+      await request(app)
+        .post(`/api/v1/projects//files`)
+        .set('Authorization', `Bearer ${userOneAccessToken}`)
+        .set('Content-Type', 'multipart/form-data')
+        .field('type', 'data')
+        .attach('files', newFile.buffer, newFile.originalname)
+        .expect(httpStatus.NOT_FOUND);
+    });
+  });
+
+  describe('GET /api/v1/projects/:projectId/files', () => {
+    test('should return 200 and apply the default query options', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+      await insertFiles([dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app).get(`/api/v1/projects/${projectOne._id}/files`).expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 4,
+      });
+      expect(res.body.results).toHaveLength(4);
+      expect({
+        ...res.body.results[0],
+        metadata: {
+          ...res.body.results[0].metadata,
+        },
+      }).toMatchObject({
+        length: dataOne.size,
+        contentType: dataOne.mimetype,
+        filename: dataOne.originalname,
+        metadata: {
+          uploaderId: userOne._id.toHexString(),
+          projectId: projectOne._id.toHexString(),
+          type: 'data',
+        },
+      });
+    });
+
+    test('should correctly apply filter on filename field', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ filename: dataOne.originalname })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 1,
+      });
+      expect(res.body.results).toHaveLength(1);
+      expect({
+        ...res.body.results[0],
+        metadata: {
+          ...res.body.results[0].metadata,
+        },
+      }).toMatchObject({
+        length: dataOne.size,
+        contentType: dataOne.mimetype,
+        filename: dataOne.originalname,
+        metadata: {
+          uploaderId: userOne._id.toHexString(),
+          projectId: projectOne._id.toHexString(),
+          type: 'data',
+        },
+      });
+    });
+
+    test('should correctly apply filter on type field', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, modelOne], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ type: 'data' })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 1,
+      });
+      expect(res.body.results).toHaveLength(1);
+      expect({
+        ...res.body.results[0],
+        metadata: {
+          ...res.body.results[0].metadata,
+        },
+      }).toMatchObject({
+        length: dataOne.size,
+        contentType: dataOne.mimetype,
+        filename: dataOne.originalname,
+        metadata: {
+          uploaderId: userOne._id.toHexString(),
+          projectId: projectOne._id.toHexString(),
+          type: 'data',
+        },
+      });
+    });
+
+    test('should correctly apply filter on projectId field', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne, projectTwo]);
+
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+      await insertFiles([dataTwo], projectTwo._id, userOne._id);
+
+      const res = await request(app).get(`/api/v1/projects/${projectOne._id}/files`).expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 1,
+      });
+
+      expect(res.body.results).toHaveLength(1);
+      expect({
+        ...res.body.results[0],
+        metadata: {
+          ...res.body.results[0].metadata,
+        },
+      }).toMatchObject({
+        length: dataOne.size,
+        contentType: dataOne.mimetype,
+        filename: dataOne.originalname,
+        metadata: {
+          uploaderId: userOne._id.toHexString(),
+          projectId: projectOne._id.toHexString(),
+          type: 'data',
+        },
+      });
+    });
+
+    test('should correctly apply filter on uploaderId field', async () => {
+      await insertUsers([userOne, userTwo]);
+      await insertProjects([projectOne]);
+
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+      await insertFiles([dataTwo], projectOne._id, userTwo._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ uploaderId: userOne._id.toHexString() })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 1,
+      });
+      expect(res.body.results).toHaveLength(1);
+      expect({
+        ...res.body.results[0],
+        metadata: {
+          ...res.body.results[0].metadata,
+        },
+      }).toMatchObject({
+        length: dataOne.size,
+        contentType: dataOne.mimetype,
+        filename: dataOne.originalname,
+        metadata: {
+          uploaderId: userOne._id.toHexString(),
+          projectId: projectOne._id.toHexString(),
+          type: 'data',
+        },
+      });
+    });
+
+    test('should correctly sort returned array if descending sort param is specified', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ sortBy: 'filename:desc' })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 4,
+      });
+      expect(res.body.results).toHaveLength(4);
+      const expectedOrder = [dataTwo, dataOne, modelTwo, modelOne].sort((a, b) =>
+        a.originalname > b.originalname ? -1 : 1
+      );
+      expectedOrder.forEach((file, index) => {
+        expect(res.body.results[index].filename).toEqual(file.originalname);
+      });
+    });
+
+    test('should correctly sort returned array if ascending sort param is specified', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ sortBy: 'filename:asc' })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 4,
+      });
+      expect(res.body.results).toHaveLength(4);
+      const expectedOrder = [dataTwo, dataOne, modelTwo, modelOne].sort((a, b) =>
+        a.originalname > b.originalname ? 1 : -1
+      );
+      expectedOrder.forEach((file, index) => {
+        expect(res.body.results[index].filename).toEqual(file.originalname);
+      });
+    });
+
+    test('should correctly sort returned array if multiple sorting criteria are specified', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ sortBy: 'type:desc,filename:asc' })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        totalResults: 4,
+      });
+      expect(res.body.results).toHaveLength(4);
+      const expectedOrder = [modelTwo, modelOne, dataTwo, dataOne].sort((a, b) => {
+        if (a.type === b.type) {
+          return a.originalname > b.originalname ? 1 : -1;
+        }
+        return a.type > b.type ? -1 : 1;
+      });
+      expectedOrder.forEach((file, index) => {
+        expect(res.body.results[index].filename).toEqual(file.originalname);
+      });
+    });
+
+    test('should limit returned array if limit param is specified', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ limit: 2 })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 1,
+        limit: 2,
+        totalPages: 2,
+        totalResults: 4,
+      });
+      expect(res.body.results).toHaveLength(2);
+    });
+
+    test('should return the correct page if page and limit params are specified', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne, dataTwo, modelOne, modelTwo], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ page: 2, limit: 2 })
+        .expect(httpStatus.OK);
+
+      expect(res.body).toEqual({
+        results: expect.any(Array),
+        page: 2,
+        limit: 2,
+        totalPages: 2,
+        totalResults: 4,
+      });
+      expect(res.body.results).toHaveLength(2);
+    });
+
+    test('should return 400 error if type is invalid', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+
+      await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files`)
+        .query({ type: 'invalid' })
+        .expect(httpStatus.BAD_REQUEST);
+    });
+  });
+
+  describe('GET /api/v1/projects/:projectId/files/:filename', () => {
+    test('should return 200 and the file object if data file belongs to project', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files/${dataOne.originalname}`)
+        .expect(httpStatus.OK);
+
+      // test file download
+      expect(res.headers['content-type']).toEqual(dataOne.mimetype);
+      expect(res.headers['content-disposition']).toContain(dataOne.originalname);
+      expect(res.body).toBeDefined();
+    });
+
+    test('should return 200 and the file object if model file belongs to project', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([modelOne], projectOne._id, userOne._id);
+
+      const res = await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files/${modelOne.originalname}`)
+        .expect(httpStatus.OK);
+
+      // test file download
+      expect(res.headers['content-type']).toEqual(modelOne.mimetype);
+      expect(res.headers['content-disposition']).toContain(modelOne.originalname);
+      expect(res.body).toBeDefined();
+    });
+
+    test('should return 404 error if file is not found', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+
+      await request(app)
+        .get(`/api/v1/projects/${projectOne._id}/files/${dataOne.originalname}`)
+        .expect(httpStatus.NOT_FOUND);
+    });
+
+    test('should return 404 error if file belongs to another project', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne, projectTwo]);
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+
+      await request(app)
+        .get(`/api/v1/projects/${projectTwo._id}/files/${dataOne.originalname}`)
+        .expect(httpStatus.NOT_FOUND);
+    });
+  });
+
+  describe('DELETE /api/v1/projects/:projectId/files/:filename', () => {
+    test('should return 204 if data file is deleted', async () => {
+      await insertUsers([userOne, admin]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+
+      await request(app)
+        .delete(`/api/v1/projects/${projectOne._id}/files/${dataOne.originalname}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .expect(httpStatus.NO_CONTENT);
+
+      const dbFile = await filesCollection.findOne({ filename: dataOne.originalname });
+      expect(dbFile).toBeNull();
+    });
+
+    test('should return 404 if file is not found', async () => {
+      await insertUsers([admin]);
+      await insertProjects([projectOne]);
+
+      await request(app)
+        .delete(`/api/v1/projects/${projectOne._id}/files/${dataOne.originalname}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .expect(httpStatus.NOT_FOUND);
+    });
+
+    test('should return 404 if file belongs to another project', async () => {
+      await insertUsers([userOne, admin]);
+      await insertProjects([projectOne, projectTwo]);
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+
+      await request(app)
+        .delete(`/api/v1/projects/${projectTwo._id}/files/${dataOne.originalname}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .expect(httpStatus.NOT_FOUND);
+    });
+
+    test('should return 401 if access token is missing', async () => {
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+
+      await request(app)
+        .delete(`/api/v1/projects/${projectOne._id}/files/${dataOne.originalname}`)
+        .expect(httpStatus.UNAUTHORIZED);
+    });
+
+    test('should return 403 if user is not admin', async () => {
+      await insertUsers([userOne]);
+      await insertProjects([projectOne]);
+      await insertFiles([dataOne], projectOne._id, userOne._id);
+
+      await request(app)
+        .delete(`/api/v1/projects/${projectOne._id}/files/${dataOne.originalname}`)
+        .set('Authorization', `Bearer ${userOneAccessToken}`)
+        .expect(httpStatus.FORBIDDEN);
     });
   });
 });

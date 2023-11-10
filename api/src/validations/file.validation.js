@@ -28,7 +28,9 @@ const fileValidation = {
     },
     query: Joi.object().keys({
       type: Joi.string().valid('data', 'model'),
+      filename: Joi.string(),
       uploaderId: Joi.string().custom(objectId),
+      size: Joi.number().integer(),
       sortBy: Joi.string(),
       limit: Joi.number().integer(),
       page: Joi.number().integer(),
