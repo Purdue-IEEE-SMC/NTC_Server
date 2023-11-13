@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.22.15",
-    "@babel/plugin-syntax-flow": "^7.22.5",
+    "@babel/plugin-syntax-flow": "^7.23.3",
     "@babel/plugin-transform-react-jsx": "^7.22.15",
     "cross-env": "^7.0.3",
     "eslint": "^8.53.0",
