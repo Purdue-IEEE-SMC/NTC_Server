@@ -70,6 +70,7 @@ function UserList() {
                     className="mx-1 action-button delete-button"
                     type="submit"
                     onClick={() => handleDeleteUser(user.id)}
+                    aria-label="Delete user"
                   >
                     <Trash />
                   </button>

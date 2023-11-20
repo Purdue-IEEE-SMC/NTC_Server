@@ -71,7 +71,7 @@ function FileList({ projectId, type }) {
                 <td>{humanFileSize(file.length)}</td>
                 <td>
                   <a download href={`/api/v1/projects/${projectId}/files/${file.filename}`}>
-                    <button className="mx-1 action-button download-button" type="submit">
+                    <button className="mx-1 action-button download-button" type="submit" aria-label="Download">
                       <Download />
                     </button>
                   </a>
@@ -79,6 +79,7 @@ function FileList({ projectId, type }) {
                     className="mx-1 action-button delete-button"
                     type="submit"
                     onClick={() => handleDeleteFile(file.filename)}
+                    aria-label="Delete"
                   >
                     <Trash />
                   </button>
