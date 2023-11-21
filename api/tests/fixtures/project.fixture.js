@@ -1,22 +1,22 @@
 const mongoose = require('mongoose');
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 const { Project } = require('../../src/models');
 
 const baseTimestamp = new Date();
 
 const projectOne = {
   _id: mongoose.Types.ObjectId(),
-  name: faker.random.word(),
+  name: faker.lorem.word(),
 };
 
 const projectTwo = {
   _id: mongoose.Types.ObjectId(),
-  name: faker.random.word(),
+  name: faker.lorem.word(),
 };
 
 const projectThree = {
   _id: mongoose.Types.ObjectId(),
-  name: faker.random.word(),
+  name: faker.lorem.word(),
 };
 
 const insertProjects = async (projects) => {

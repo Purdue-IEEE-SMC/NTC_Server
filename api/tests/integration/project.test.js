@@ -1,5 +1,5 @@
 const request = require('supertest');
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 const httpStatus = require('http-status');
 const mongoose = require('mongoose');
 const app = require('../../src/app');
@@ -23,7 +23,7 @@ describe('Project routes', () => {
 
     beforeEach(() => {
       newProject = {
-        name: faker.random.word(),
+        name: faker.lorem.word(),
       };
     });
 

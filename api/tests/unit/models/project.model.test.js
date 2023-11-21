@@ -1,4 +1,4 @@
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 const { Project } = require('../../../src/models');
 
 describe('Project model', () => {
@@ -6,7 +6,7 @@ describe('Project model', () => {
     let newProject;
     beforeEach(() => {
       newProject = {
-        name: faker.random.word(),
+        name: faker.lorem.word(),
       };
     });
 

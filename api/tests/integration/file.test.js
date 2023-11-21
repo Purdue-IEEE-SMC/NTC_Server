@@ -1,5 +1,5 @@
 const request = require('supertest');
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 const httpStatus = require('http-status');
 const mongoose = require('mongoose');
 const app = require('../../src/app');
@@ -29,7 +29,7 @@ describe('File routes', () => {
     let newFile;
 
     beforeEach(() => {
-      newFile = genDataFile(faker.datatype.number({ min: 1, max: 600 }));
+      newFile = genDataFile(faker.number.int({ min: 1, max: 600 }));
     });
 
     test('should return 201 and successfully upload data file', async () => {
@@ -71,8 +71,8 @@ describe('File routes', () => {
       await insertProjects([projectOne]);
       await insertUsers([userOne]);
 
-      const newFile2 = genDataFile(faker.datatype.number({ min: 1, max: 600 }));
-      const newFile3 = genDataFile(faker.datatype.number({ min: 1, max: 600 }));
+      const newFile2 = genDataFile(faker.number.int({ min: 1, max: 600 }));
+      const newFile3 = genDataFile(faker.number.int({ min: 1, max: 600 }));
 
       const res = await request(app)
         .post(`/api/v1/projects/${projectOne._id}/files`)
@@ -191,7 +191,7 @@ describe('File routes', () => {
 
       const files = [];
       for (let i = 0; i < 11; i += 1) {
-        files.push(genDataFile(faker.datatype.number({ min: 1, max: 600 })));
+        files.push(genDataFile(faker.number.int({ min: 1, max: 600 })));
       }
 
       await request(app)

@@ -1,4 +1,4 @@
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 const mongoose = require('mongoose');
 const { GridFSBucket } = require('mongodb');
 const { Readable } = require('stream');
@@ -20,14 +20,14 @@ const generateCSVData = (rows) => {
   for (let i = 0; i < rows; i += 1) {
     // Generate each field using faker, ensuring to match the structure of your data
     const rowData = [
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
-      faker.datatype.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
+      faker.number.float({ min: -200000, max: 200000, precision: 0.00000001 }),
       Date.now(), // Timestamp in milliseconds
     ];
 
@@ -44,7 +44,7 @@ const genDataFile = (rows) => {
 
   return {
     fieldname: 'files',
-    originalname: `${faker.random.word()}.csv`,
+    originalname: `${faker.lorem.word()}.csv`,
     encoding: '7bit',
     mimetype: 'text/csv',
     buffer: csvBuffer,
@@ -56,12 +56,12 @@ const genDataFile = (rows) => {
 };
 
 const genModelFile = () => {
-  const bufferSize = faker.datatype.number({ min: 1024, max: 10240 });
-  const buffer = Buffer.alloc(bufferSize, faker.datatype.number({ min: 0, max: 255 }));
+  const bufferSize = faker.number.int({ min: 1024, max: 10240 });
+  const buffer = Buffer.alloc(bufferSize, faker.number.int({ min: 0, max: 255 }));
 
   return {
     fieldname: 'files',
-    originalname: `${faker.random.word()}.cpkt`,
+    originalname: `${faker.lorem.word()}.cpkt`,
     encoding: '7bit',
     mimetype: 'application/octet-stream',
     buffer,
@@ -72,9 +72,9 @@ const genModelFile = () => {
   };
 };
 
-const dataOne = genDataFile(faker.datatype.number({ min: 1, max: 600 }));
-const dataTwo = genDataFile(faker.datatype.number({ min: 1, max: 600 }));
-const dataThree = genDataFile(faker.datatype.number({ min: 1, max: 600 }));
+const dataOne = genDataFile(faker.number.int({ min: 1, max: 600 }));
+const dataTwo = genDataFile(faker.number.int({ min: 1, max: 600 }));
+const dataThree = genDataFile(faker.number.int({ min: 1, max: 600 }));
 
 const modelOne = genModelFile();
 const modelTwo = genModelFile();
