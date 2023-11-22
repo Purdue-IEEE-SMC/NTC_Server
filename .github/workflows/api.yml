@@ -19,6 +19,12 @@ jobs:
         with:
           node-version: 18
 
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: api/node_modules
+          key: ${{ runner.os }}-cache
+
       - name: Install dependencies
         run: yarn
 
@@ -59,12 +65,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: api/node_modules
-          key: ${{ runner.os }}-cache
 
       - name: Install dependencies
         run: yarn
