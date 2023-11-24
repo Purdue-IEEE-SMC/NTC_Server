@@ -29,7 +29,7 @@ const logout = async (refreshToken) => {
   if (!refreshTokenDoc) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
   }
-  await refreshTokenDoc.remove();
+  await Token.deleteOne({ token: refreshToken, type: tokenTypes.REFRESH, blacklisted: false });
 };
 
 /**
@@ -44,7 +44,7 @@ const refreshAuth = async (refreshToken) => {
     if (!user) {
       throw new Error();
     }
-    await refreshTokenDoc.remove();
+    await Token.deleteOne({ token: refreshToken, type: tokenTypes.REFRESH, blacklisted: false });
     return tokenService.generateAuthTokens(user);
   } catch (error) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');

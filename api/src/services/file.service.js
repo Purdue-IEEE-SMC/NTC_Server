@@ -18,7 +18,7 @@ const setupUpload = () => {
         bucketName: 'files',
         metadata: {
           uploaderId: req.user._id,
-          projectId: mongoose.Types.ObjectId(req.params.projectId),
+          projectId: new mongoose.Types.ObjectId(req.params.projectId),
           type: req.body.type,
         },
       };
@@ -103,7 +103,7 @@ const paginateFile = async (filter, options) => {
     if (key === 'type') {
       newFilter[`metadata.${key}`] = filter[key];
     } else if (key === 'projectId' || key === 'uploaderId') {
-      newFilter[`metadata.${key}`] = mongoose.Types.ObjectId(filter[key]);
+      newFilter[`metadata.${key}`] = new mongoose.Types.ObjectId(filter[key]);
     } else {
       newFilter[key] = filter[key];
     }
@@ -146,7 +146,7 @@ const queryFiles = async (filter, options) => {
  * @returns {Promise<any>}
  */
 const getFileByFilename = async (projectId, filename) => {
-  const file = await getColl().findOne({ filename, 'metadata.projectId': mongoose.Types.ObjectId(projectId) });
+  const file = await getColl().findOne({ filename, 'metadata.projectId': new mongoose.Types.ObjectId(projectId) });
   if (!file) {
     throw new ApiError(httpStatus.NOT_FOUND, 'File not found');
   }
@@ -192,7 +192,7 @@ const deleteFile = async (id) => {
  */
 const deleteFilesByProjectId = async (projectId) => {
   const files = await getColl()
-    .find({ 'metadata.projectId': mongoose.Types.ObjectId(projectId) })
+    .find({ 'metadata.projectId': new mongoose.Types.ObjectId(projectId) })
     .toArray();
   await Promise.all(
     files.map((file) =>

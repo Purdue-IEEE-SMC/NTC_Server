@@ -37,11 +37,7 @@ module.exports = {
   port: envVars.PORT,
   mongoose: {
     url: `${envVars.MONGODB_URI + (envVars.NODE_ENV === 'test' ? '-test' : '')}?retryWrites=true&w=majority`,
-    options: {
-      useCreateIndex: true,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    },
+    options: {},
   },
   encryptionKey: envVars.ENCRYPTION_KEY,
   jwt: {

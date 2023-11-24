@@ -4,6 +4,12 @@ const config = require('../../src/config/config');
 const setupTestDB = () => {
   beforeAll(async () => {
     await mongoose.connect(config.mongoose.url, config.mongoose.options);
+    try {
+      await mongoose.connection.db.createCollection('files.files');
+      await mongoose.connection.db.createCollection('files.chunks');
+    } catch (err) {
+      // Collection already exists
+    }
   });
 
   beforeEach(async () => {

@@ -66,7 +66,7 @@ const deleteProjectById = async (projectId) => {
   if (!project) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Project not found');
   }
-  await project.remove();
+  await Project.deleteOne({ _id: projectId });
   return project;
 };
 
