@@ -80,7 +80,7 @@ function CreateUser() {
       setVerifyPasswordErr('');
     }
     setVerifyPassword(e.target.value);
-  }
+  };
 
   return (
     <div>
