@@ -1,18 +1,43 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  user: {
-    id: null,
-    email: null,
-    name: null,
-    role: null,
-    isEmailVerified: null,
-  },
-  tokens: {
-    access: { token: null, expires: null },
-    refresh: { token: null, expires: null },
-  },
+const getInitialState = () => {
+  const user = localStorage.getItem('user');
+  const tokens = localStorage.getItem('tokens');
+
+  const fallback = {
+    user: {
+      id: null,
+      email: null,
+      name: null,
+      role: null,
+      isEmailVerified: null,
+    },
+    tokens: {
+      access: {
+        token: null,
+        expires: null,
+      },
+      refresh: {
+        token: null,
+        expires: null,
+      },
+    },
+  };
+
+  try {
+    if (user && tokens) {
+      return {
+        user: JSON.parse(user),
+        tokens: JSON.parse(tokens),
+      };
+    }
+  } catch (e) {
+    return fallback;
+  }
+  return fallback;
 };
+
+const initialState = getInitialState();
 
 const authSlice = createSlice({
   name: 'auth',
@@ -22,13 +47,18 @@ const authSlice = createSlice({
       const { user, tokens } = action.payload;
       state.user = user;
       state.tokens = tokens;
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('tokens', JSON.stringify(tokens));
     },
     setTokens: (state, action) => {
       state.tokens = action.payload;
+      localStorage.setItem('tokens', JSON.stringify(action.payload));
     },
     logout: (state) => {
       state.user = initialState.user;
       state.tokens = initialState.tokens;
+      localStorage.removeItem('user');
+      localStorage.removeItem('tokens');
     },
   },
 });
