@@ -6,7 +6,6 @@ const pick = require('../utils/pick');
 
 const uploadFiles = catchAsync(async (req, res) => {
   fileService.upload.array('files', 10)(req, res, async (err) => {
-    console.log("Files received")
     if (err || !req.files) {
       if (err && err instanceof ApiError) {
         res.status(err.statusCode).send(err.message);
