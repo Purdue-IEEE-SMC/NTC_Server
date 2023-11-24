@@ -5,6 +5,7 @@ const ApiError = require('../utils/ApiError');
 const pick = require('../utils/pick');
 
 const uploadFiles = catchAsync(async (req, res) => {
+  console.log("A")
   fileService.upload.array('files', 10)(req, res, async (err) => {
     if (err || !req.files) {
       if (err && err instanceof ApiError) {

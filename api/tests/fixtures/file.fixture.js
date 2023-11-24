@@ -81,8 +81,9 @@ const modelTwo = genModelFile();
 const modelThree = genModelFile();
 
 const insertFiles = async (files, projectId, uploaderId) => {
+  console.log("B")
   const gridFSBucket = getGridFSBucket(); // Get the GridFSBucket instance
-
+  console.log("C")
   return Promise.all(
     files.map((file) => {
       return new Promise((resolve, reject) => {
@@ -90,14 +91,16 @@ const insertFiles = async (files, projectId, uploaderId) => {
         const readableStream = new Readable();
         readableStream.push(file.buffer);
         readableStream.push(null); // No more data
-
+        console.log("D")
         // Create an upload stream using GridFSBucket
         const uploadStream = gridFSBucket.openUploadStream(file.originalname, {
           contentType: file.mimetype,
           metadata: { ...file.metadata, projectId, uploaderId },
         });
+        console.log("E")
 
         readableStream.pipe(uploadStream).on('error', reject).on('finish', resolve);
+        console.log("F")
       });
     })
   );
