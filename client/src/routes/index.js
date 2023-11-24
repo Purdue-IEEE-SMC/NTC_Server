@@ -10,20 +10,26 @@ import Project from '../containers/Project/Project';
 import NotFound from '../containers/NotFound/NotFound';
 import ProjectsPage from '../containers/ProjectsList/ProjectsPage';
 import AdminPage from '../containers/Admin/AdminPage';
+import Session from './Sesssion';
+import External from './External';
 
 function AppRoutes() {
   return (
     <Router>
       <Routes>
-        <Route index element={<Home />} />
-        <Route element={<RequireUnauth />}>
-          <Route path="login" element={<Login />} />
+        <Route element={<External />}>
+          <Route index element={<Home />} />
+          <Route element={<RequireUnauth />}>
+            <Route path="login" element={<Login />} />
+          </Route>
         </Route>
-        <Route path="projects" element={<ProjectsPage />} />
-        <Route path="projects/:projectId" element={<Project />} />
-        <Route path="*" element={<NotFound />} />
-        <Route element={<RequireAdmin />}>
-          <Route path="admin" element={<AdminPage />} />
+        <Route element={<Session />}>
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="projects/:projectId" element={<Project />} />
+          <Route path="*" element={<NotFound />} />
+          <Route element={<RequireAdmin />}>
+            <Route path="admin" element={<AdminPage />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

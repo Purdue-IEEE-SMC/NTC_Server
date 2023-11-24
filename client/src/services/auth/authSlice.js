@@ -1,28 +1,28 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const defaultState = {
+  user: {
+    id: null,
+    email: null,
+    name: null,
+    role: null,
+    isEmailVerified: null,
+  },
+  tokens: {
+    access: {
+      token: null,
+      expires: null,
+    },
+    refresh: {
+      token: null,
+      expires: null,
+    },
+  },
+};
+
 const getInitialState = () => {
   const user = localStorage.getItem('user');
   const tokens = localStorage.getItem('tokens');
-
-  const fallback = {
-    user: {
-      id: null,
-      email: null,
-      name: null,
-      role: null,
-      isEmailVerified: null,
-    },
-    tokens: {
-      access: {
-        token: null,
-        expires: null,
-      },
-      refresh: {
-        token: null,
-        expires: null,
-      },
-    },
-  };
 
   try {
     if (user && tokens) {
@@ -32,9 +32,9 @@ const getInitialState = () => {
       };
     }
   } catch (e) {
-    return fallback;
+    return defaultState;
   }
-  return fallback;
+  return defaultState;
 };
 
 const initialState = getInitialState();
@@ -55,8 +55,8 @@ const authSlice = createSlice({
       localStorage.setItem('tokens', JSON.stringify(action.payload));
     },
     logout: (state) => {
-      state.user = initialState.user;
-      state.tokens = initialState.tokens;
+      state.user = defaultState.user;
+      state.tokens = defaultState.tokens;
       localStorage.removeItem('user');
       localStorage.removeItem('tokens');
     },
