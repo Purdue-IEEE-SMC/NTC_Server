@@ -28,6 +28,7 @@ const setupUpload = () => {
   upload = multer({
     storage,
     fileFilter: async (req, file, callback) => {
+      console.log("File filter")
       const project = await projectService.getProjectById(req.params.projectId);
       if (!project) {
         return callback(new ApiError(httpStatus.NOT_FOUND, 'Project not found'));
@@ -48,6 +49,7 @@ const setupUpload = () => {
 
 mongoose.connection.on('connected', () => {
   setupUpload();
+  console.log("Set up upload")
 });
 
 /**
@@ -147,6 +149,7 @@ const queryFiles = async (filter, options) => {
  */
 const getFileByFilename = async (projectId, filename) => {
   const file = await getColl().findOne({ filename, 'metadata.projectId': new mongoose.Types.ObjectId(projectId) });
+  console.log("Found file")
   if (!file) {
     throw new ApiError(httpStatus.NOT_FOUND, 'File not found');
   }
