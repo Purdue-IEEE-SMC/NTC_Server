@@ -12,6 +12,8 @@ function CreateUser() {
   const [admin, setAdmin] = useState('');
   const [password, setPassword] = useState('');
   const [passwordErr, setPasswordErr] = useState('');
+  const [verifyPassword, setVerifyPassword] = useState('');
+  const [verifyPasswordErr, setVerifyPasswordErr] = useState('');
 
   const handleSubmit = async () => {
     if (!name || !email || !password) {
@@ -27,6 +29,10 @@ function CreateUser() {
         setPasswordErr('Password must not be empty');
         return;
       }
+    }
+    if (password !== verifyPassword) {
+      setVerifyPasswordErr('Passwords do not match');
+      return;
     }
     const role = admin ? 'admin' : 'user';
     await createUser({ name, email, role, password });
@@ -67,6 +73,15 @@ function CreateUser() {
     setPassword(e.target.value);
   };
 
+  const handleVerifyPasswordChange = (e) => {
+    if (e.target.value !== password) {
+      setVerifyPasswordErr('Passwords must match');
+    } else {
+      setVerifyPasswordErr('');
+    }
+    setVerifyPassword(e.target.value);
+  }
+
   return (
     <div>
       <Button variant="primary" onClick={() => setShow(true)}>
@@ -80,22 +95,22 @@ function CreateUser() {
         <Modal.Body>
           <Form noValidate>
             <Form.Group className="mb-3" controlId="formUserName">
-              <Form.Label>User Name</Form.Label>
+              <Form.Label>Full Name</Form.Label>
               <Form.Control
                 isInvalid={!!nameErr}
                 type="text"
-                placeholder="Enter user name"
+                placeholder="Full Name"
                 onChange={handleNameChange}
                 required
               />
               <Form.Control.Feedback type="invalid">{nameErr}</Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="formUserEmail">
-              <Form.Label>User Email</Form.Label>
+              <Form.Label>Purdue Email</Form.Label>
               <Form.Control
                 isInvalid={!!emailErr}
                 type="email"
-                placeholder="Enter user email"
+                placeholder="example@purdue.edu"
                 onChange={handleEmailChange}
                 required
               />
@@ -115,6 +130,17 @@ function CreateUser() {
                 required
               />
               <Form.Control.Feedback type="invalid">{passwordErr}</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="formUserVerifyPassword">
+              <Form.Label>Verify Password</Form.Label>
+              <Form.Control
+                isInvalid={!!verifyPasswordErr}
+                type="password"
+                placeholder="password"
+                onChange={handleVerifyPasswordChange}
+                required
+              />
+              <Form.Control.Feedback type="invalid">{verifyPasswordErr}</Form.Control.Feedback>
             </Form.Group>
           </Form>
           {isError && <Alert variant="danger">Error: {error?.data?.message}</Alert>}
