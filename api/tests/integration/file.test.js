@@ -35,7 +35,6 @@ describe('File routes', () => {
     test('should return 201 and successfully upload data file', async () => {
       await insertProjects([projectOne]);
       await insertUsers([userOne]);
-      console.log("A")
 
       const res = await request(app)
         .post(`/api/v1/projects/${projectOne._id}/files`)
@@ -45,11 +44,9 @@ describe('File routes', () => {
         .attach('files', newFile.buffer, newFile.originalname)
         .expect(httpStatus.CREATED);
 
-      console.log("B")
       expect(res.body).toHaveProperty('files');
       expect(res.body.files).toEqual(expect.any(Array));
       expect(res.body.files[0]).toEqual(expect.stringMatching(genFilenameRegex(newFile.originalname)));
-      console.log("C")
 
       const dbFile = await filesCollection.findOne({ filename: res.body.files[0] });
       expect({
@@ -68,8 +65,6 @@ describe('File routes', () => {
           type: 'data',
         },
       });
-
-      console.log("D")
     });
 
     test('should return 201 and successfully upload multiple data files', async () => {
