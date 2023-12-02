@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Container, Nav, Navbar as BootstrapBar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'react-bootstrap-icons';
 import {
   selectRefreshToken,
@@ -21,6 +21,7 @@ function Navbar() {
   const [logout, { isLoading }] = useLogoutUserMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     await logout(refreshToken);
@@ -31,11 +32,13 @@ function Navbar() {
   return (
     <BootstrapBar bg="dark" className="navbar">
       <Container>
-        <Nav>
-          <Button variant="secondary" onClick={() => navigate(-1)}>
-            <ArrowLeft size={20} />
-          </Button>
-        </Nav>
+        {location.key !== 'default' && (
+          <Nav>
+            <Button variant="secondary" onClick={() => navigate(-1)}>
+              <ArrowLeft size={20} />
+            </Button>
+          </Nav>
+        )}
         <BootstrapBar.Collapse className="justify-content-end">
           <Nav>
             <BootstrapBar.Text className="mx-3">
