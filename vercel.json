@@ -28,12 +28,48 @@
       "dest": "client/static/$1"
     },
     {
+      "src": "/favicon-16x16.png",
+      "dest": "client/favicon-16x16.png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "dest": "client/favicon-32x32.png"
+    },
+    {
       "src": "/favicon.ico",
       "dest": "client/favicon.ico"
     },
     {
       "src": "/apple-touch-icon.png",
       "dest": "client/apple-touch-icon.png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "dest": "client/android-chrome-192x192.png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "dest": "client/android-chrome-512x512.png"
+    },
+    {
+      "src": "/mstile-150x150.png",
+      "dest": "client/mstile-150x150.png"
+    },
+    {
+      "src": "/safari-pinned-tab.svg",
+      "dest": "client/safari-pinned-tab.svg"
+    },
+    {
+      "src": "/browserconfig.xml",
+      "dest": "client/browserconfig.xml"
+    },
+    {
+      "src": "/site.webmanifest",
+      "dest": "client/site.webmanifest"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "client/robots.txt"
     },
     {
       "src": "/asset-manifest.json",
