@@ -18,8 +18,8 @@ function AppRoutes() {
     <Router>
       <Routes>
         <Route element={<External />}>
-          <Route index element={<Home />} />
           <Route element={<RequireUnauth />}>
+            <Route index element={<Home />} />
             <Route path="login" element={<Login />} />
           </Route>
         </Route>
